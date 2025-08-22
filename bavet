@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>អាហាររហ័សក្រុងបាវិត</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <div class="info-card">
+      <h2>អាហាររហ័សក្រុងបាវិត</h2>
+      <div>⏰ បើក 10:00 – 21:00</div>
+      <div>✅ ដឹកជញ្ជូនឥតគិតថ្លៃ</div>
+      <button>TG Seller: @Vanyou_999</button>
+    </div>
+  </div>
+
+  <div class="menu-grid" id="menu"></div>
+
+  <button class="cart-fab" onclick="openCart()">🛒 <span id="cartCount">0</span></button>
+
+  <dialog id="cart">
+    <div class="cart-head">
+      <strong>Your Cart</strong>
+      <button onclick="closeCart()">Close</button>
+    </div>
+    <input type="text" id="buyerUsername" placeholder="Telegram Username"/>
+    <input type="text" id="buyerLocation" placeholder="Location"/>
+    <div id="cartItems"></div>
+    <p>Total: <span id="cartTotal">៛0</span></p>
+    <button class="checkout-btn" onclick="checkoutTelegram()">Order Now</button>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
