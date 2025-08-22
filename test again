@@ -1,0 +1,108 @@
+const baseItems = [
+  { name:"បាយឆាក្ដៅកង្កែប", desc:"", price:15000, img:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092" },
+  { name:"ស៊ុបកូនមាន់ស្រួយ", desc:"", price:12000, img:"https://images.unsplash.com/photo-1617196034796-73e0f675985d" },
+  { name:"កាយបារីសាច់គោ", desc:"", price:12000, img:"https://images.unsplash.com/photo-1605478580702-c9d2bb11f7ab" },
+  { name:"បាយឆាសាច់ជ្រូក", desc:"4 pcs with sweet chili dip.", price:12000, img:"https://images.unsplash.com/photo-1589308078056-f06f3c45f6b5" },
+  { name:"បាយឆា", desc:"", price:12000, img:"https://images.unsplash.com/photo-1617191517002-fba9cc9e9286" },
+  { name:"កាយបារីសាច់មាន់", desc:"", price:12000, img:"https://images.unsplash.com/photo-1625940924522-6a33d7e644a1" }
+];
+
+const menu = Array.from({length:100}, (_,i)=>baseItems[i % baseItems.length]);
+
+const menuDiv = document.getElementById("menu");
+menu.forEach((item,index)=>{
+  const card = document.createElement("div");
+  card.className="card";
+  card.innerHTML=`
+    <img src="${item.img}" alt="${item.name}" />
+    <div class="card-body">
+      <h3>${item.name}</h3>
+      <p>${item.desc}</p>
+      <strong>៛${item.price.toLocaleString()}</strong>
+      <button onclick="addToCart(${index})">Add to Cart</button>
+    </div>
+  `;
+  menuDiv.appendChild(card);
+});
+
+let cart = {};
+
+function addToCart(i){
+  if(!cart[i]) cart[i]=1;
+  else cart[i]++;
+  renderCart();
+  updateCartCount();
+}
+
+function removeFromCart(i){
+  if(cart[i]) cart[i]--;
+  if(cart[i]<=0) delete cart[i];
+  renderCart();
+  updateCartCount();
+}
+
+function renderCart(){
+  const cartItemsDiv=document.getElementById("cartItems");
+  cartItemsDiv.innerHTML="";
+  let total=0;
+  for(let i in cart){
+    const item=menu[i];
+    const qty=cart[i];
+    total+=item.price*qty;
+
+    const div=document.createElement("div");
+    div.className="cart-item";
+    div.innerHTML=`
+      <span>${item.name} – ៛${(item.price*qty).toLocaleString()}</span>
+      <div class="quantity-controls">
+        <button onclick="removeFromCart(${i})">-</button>
+        <span>${qty}</span>
+        <button onclick="addToCart(${i})">+</button>
+      </div>
+    `;
+    cartItemsDiv.appendChild(div);
+  }
+  document.getElementById("cartTotal").innerText=`៛${total.toLocaleString()}`;
+}
+
+function updateCartCount(){
+  const count=Object.values(cart).reduce((a,b)=>a+b,0);
+  document.getElementById("cartCount").innerText=count;
+}
+
+function openCart(){
+  renderCart();
+  document.getElementById("cart").showModal();
+}
+
+function closeCart(){ document.getElementById("cart").close(); }
+
+function checkoutTelegram(){
+  const username = document.getElementById("buyerUsername").value.trim();
+  const location = document.getElementById("buyerLocation").value.trim();
+  if(!username || !location){
+    alert("សូមបំពេញ Telegram Username និង Location!");
+    return;
+  }
+  let message=`បញ្ជាទិញម្ហូប៖\nUsername: ${username}\nLocation: ${location}\n\n`;
+  let total=0;
+  for(let i in cart){
+    const item=menu[i];
+    const qty=cart[i];
+    total+=item.price*qty;
+    message+=`- ${item.name} x ${qty} = ៛${(item.price*qty).toLocaleString()}\n`;
+  }
+  message+=`\nសរុប: ៛${total.toLocaleString()}`;
+
+  const token="YOUR_TELEGRAM_BOT_TOKEN";
+  const chatId="YOUR_CHAT_ID";
+  fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({chat_id:chatId,text:message})
+  });
+  alert("បានផ្ញើការបញ្ជាទិញទៅ Telegram!");
+  closeCart();
+  cart={};
+  updateCartCount();
+}
